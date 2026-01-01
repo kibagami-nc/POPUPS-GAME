@@ -183,34 +183,52 @@ class PopUpGame {
             </div>
         `;
 
-        // First append to DOM (hidden) to get dimensions
+        // Hide it first and append to DOM to get initial dimensions (if not image)
         popup.style.visibility = 'hidden';
         this.popupArea.appendChild(popup);
 
-        // Wait for a frame to ensure layout is calculated
-        requestAnimationFrame(() => {
-            const popupWidth = popup.offsetWidth;
-            const popupHeight = popup.offsetHeight;
-
-            // Position Logic: Stay within viewport, avoiding HUD (approx top 100px)
-            const hudOffset = 100;
-
-            // Calculate max possible values
-            const maxX = Math.max(0, window.innerWidth - popupWidth - 20);
-            const maxY = Math.max(hudOffset, window.innerHeight - popupHeight - 20);
-
-            const x = 10 + Math.random() * maxX;
-            const y = hudOffset + Math.random() * (maxY - hudOffset);
-
-            popup.style.left = `${x}px`;
-            popup.style.top = `${y}px`;
-            popup.style.visibility = 'visible';
-        });
+        const img = popup.querySelector('img');
+        if (img && !img.complete) {
+            img.onload = () => this.applyPosition(popup);
+            img.onerror = () => this.applyPosition(popup);
+        } else {
+            this.applyPosition(popup);
+        }
 
         const closeBtn = popup.querySelector('.close-popup-btn');
         closeBtn.onclick = () => this.closePopup(popup);
 
         this.popups.push(popup);
+    }
+
+    applyPosition(popup) {
+        // Ensure it's in the DOM
+        if (!popup.parentNode) return;
+
+        // First append to DOM (hidden) to get dimensions
+        popup.style.visibility = 'hidden';
+
+        // Wait for a frame to ensure layout is calculated
+        requestAnimationFrame(() => {
+            const popupWidth = popup.offsetWidth || 320;
+            const popupHeight = popup.offsetHeight || 200;
+
+            // Position Logic: Stay within viewport, avoiding HUD (approx top 100px)
+            const margin = 20;
+            const hudOffset = 100;
+
+            // Calculate max possible values
+            const maxX = Math.max(0, window.innerWidth - popupWidth - margin);
+            const maxY = Math.max(hudOffset, window.innerHeight - popupHeight - margin);
+
+            // Random coordinates within safe zone
+            const x = Math.floor(margin / 2 + Math.random() * maxX);
+            const y = Math.floor(hudOffset + Math.random() * (maxY - hudOffset));
+
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+            popup.style.visibility = 'visible';
+        });
     }
 
     closePopup(popup) {
@@ -267,24 +285,41 @@ class PopUpGame {
 
     saveScore(name, score) {
         let scores = JSON.parse(localStorage.getItem('popup_scores') || '[]');
-        scores.push({ name, score });
-        scores.sort((a, b) => b.score - a.score);
-        scores = scores.slice(0, 5); // Keep top 5
+        const timestamp = Date.now();
+        this.lastScoreTimestamp = timestamp; // Store to identify current score
+        scores.push({ name, score, timestamp });
+        scores.sort((a, b) => b.score - a.score || b.timestamp - a.timestamp);
+        scores = scores.slice(0, 50); // Keep enough to track rank
         localStorage.setItem('popup_scores', JSON.stringify(scores));
     }
 
     updateLeaderboardUI() {
         const scores = JSON.parse(localStorage.getItem('popup_scores') || '[]');
-        this.leaderboardList.innerHTML = scores.map((s, i) => {
-            const medals = ["🥇", "🥈", "🥉", "🏅", "🏅"];
-            return `
-                <li>
-                    <span class="rank">${medals[i]}</span>
-                    <span class="pseudo">${s.name}</span>
-                    <span class="score">${s.score} pts</span>
+
+        // Render top 5
+        let html = scores.slice(0, 5).map((s, i) => `
+            <li>
+                <span class="rank">#${i + 1}</span>
+                <span class="pseudo">${s.name}</span>
+                <span class="score">${s.score} pts</span>
+            </li>
+        `).join('');
+
+        // Check if current score is outside top 5
+        const currentIndex = scores.findIndex(s => s.timestamp === this.lastScoreTimestamp);
+        if (currentIndex >= 5) {
+            const currentScore = scores[currentIndex];
+            html += `
+                <li class="leaderboard-separator">...</li>
+                <li class="current-player-rank">
+                    <span class="rank">#${currentIndex + 1}</span>
+                    <span class="pseudo">${currentScore.name}</span>
+                    <span class="score">${currentScore.score} pts</span>
                 </li>
             `;
-        }).join('');
+        }
+
+        this.leaderboardList.innerHTML = html;
     }
 
     resetGame() {

@@ -94,6 +94,7 @@ body {
     margin-bottom: 0.5rem;
     background: linear-gradient(to bottom, #fff, #94a3b8);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     position: relative;
 }
@@ -437,6 +438,28 @@ button {
 
 .leaderboard li .pseudo {
     flex-grow: 1;
+}
+
+.leaderboard-separator {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-gray);
+    padding: 0.3rem 0 !important;
+    border-bottom: none !important;
+}
+
+.current-player-rank {
+    border: 1px solid var(--warning);
+    border-radius: 8px;
+    padding: 0.75rem !important;
+    margin-top: 0.5rem;
+    background: rgba(241, 196, 15, 0.1);
+}
+
+.current-player-rank .rank,
+.current-player-rank .pseudo {
+    color: var(--warning);
+    font-weight: 700;
 }
 
 .secondary-link {
