@@ -3,6 +3,13 @@
  * Recreated from Python version
  */
 
+// Sound Effects (Optional placeholders for now)
+const SFX = {
+    pop: new Audio(),
+    close: new Audio(),
+    win: new Audio()
+};
+
 class PopUpGame {
     constructor() {
         this.score = 0;
@@ -29,7 +36,8 @@ class PopUpGame {
             start: document.getElementById('start-screen'),
             game: document.getElementById('game-board'),
             password: document.getElementById('password-screen'),
-            victory: document.getElementById('victory-screen')
+            victory: document.getElementById('victory-screen'),
+            hacked: document.getElementById('hacked-screen')
         };
 
         // Inputs & Buttons
@@ -39,6 +47,7 @@ class PopUpGame {
         this.validatePwdBtn = document.getElementById('validate-pwd-btn');
         this.hintBtn = document.getElementById('hint-btn');
         this.restartBtn = document.getElementById('restart-btn');
+        this.restartHackedBtn = document.querySelector('.restart-hacked-btn');
         this.hintBox = document.getElementById('hint-box');
 
         // Displays
@@ -50,6 +59,9 @@ class PopUpGame {
         this.finalName = document.getElementById('final-name');
         this.finalScore = document.getElementById('final-score');
         this.leaderboardList = document.getElementById('leaderboard-list');
+
+        // HUD wrapper for timer pulse effect
+        this.timerItem = document.querySelector('.timer-item');
     }
 
     initEvents() {
@@ -59,6 +71,7 @@ class PopUpGame {
             this.hintBox.classList.toggle('hidden');
         });
         this.restartBtn.addEventListener('click', () => this.resetGame());
+        this.restartHackedBtn.addEventListener('click', () => this.showScreen('start'));
 
         // Enter key support
         this.nameInput.addEventListener('keypress', (e) => {
@@ -96,6 +109,7 @@ class PopUpGame {
         this.timeRemaining = this.timeLimit;
         this.gameActive = true;
         this.popupDelay = 2000;
+        this.attempts = 3; // Reset attempts to 3 at start of game
 
         // Setup Password
         const years = ["2020", "2021", "2022", "2023", "2024", "2025"];
@@ -107,6 +121,7 @@ class PopUpGame {
         this.displayName.textContent = this.playerName;
         this.displayScore.textContent = "0";
         this.displayTimer.textContent = `${this.timeRemaining}s`;
+        this.timerItem.classList.remove('urgent');
         this.popupArea.innerHTML = '';
         this.popups = [];
         this.currentPasswordPartIndex = 0;
@@ -123,6 +138,10 @@ class PopUpGame {
             this.timeRemaining--;
             this.displayTimer.textContent = `${this.timeRemaining}s`;
 
+            if (this.timeRemaining <= 10) {
+                this.timerItem.classList.add('urgent');
+            }
+
             if (this.timeRemaining <= 0) {
                 this.endGamePhase();
             }
@@ -134,24 +153,37 @@ class PopUpGame {
 
         this.createPopup();
 
-        // Calculate next delay based on score (similar to Python logic)
-        const speedFactor = Math.min(this.score * 0.05, 0.8);
-        this.popupDelay = Math.max(this.minDelay, 2000 - (2000 * speedFactor));
+        // Calculate next delay based on TIME ELAPSED (Scale difficulty)
+        const progress = (this.timeLimit - this.timeRemaining) / this.timeLimit;
+        // Using a square root curve: it ramps up fast but slows its acceleration at the end
+        // And capping it at 0.7 (70% faster) instead of 0.9 to keep it manageable
+        const speedFactor = Math.sqrt(progress) * 0.7;
 
-        this.popupInterval = setTimeout(() => this.scheduleNextPopup(), this.popupDelay);
+        this.popupDelay = Math.max(this.minDelay, 1500 - (1500 * speedFactor));
+
+        // Add randomness to delay
+        const randomDelay = this.popupDelay * (0.8 + Math.random() * 0.4);
+
+        this.popupInterval = setTimeout(() => this.scheduleNextPopup(), randomDelay);
     }
 
     createPopup() {
         const popup = document.createElement('div');
 
         // Decide if this is a Password Clue Popup or a standard Ad Popup
-        // Show a clue popup every 5 points, until all are shown
-        const shouldShowClue = this.score > 0 &&
-            this.score % 5 === 0 &&
+        // NOW BASED ON TIME: Every 6 seconds for 4 parts in 30s
+        const elapsed = this.timeLimit - this.timeRemaining;
+        const clueThreshold = (this.currentPasswordPartIndex + 1) * 6;
+
+        const shouldShowClue = elapsed >= clueThreshold &&
             this.currentPasswordPartIndex < this.passwordParts.length;
 
         let part = "";
         let isClue = false;
+
+        // Random theme for variety
+        const themes = ['theme-classic', 'theme-modern', 'theme-alert', 'theme-neon'];
+        const randomTheme = themes[Math.floor(Math.random() * themes.length)];
 
         if (shouldShowClue) {
             part = this.passwordParts[this.currentPasswordPartIndex];
@@ -159,108 +191,169 @@ class PopUpGame {
             isClue = true;
             popup.className = 'game-popup clue-popup';
         } else {
-            popup.className = 'game-popup';
+            popup.className = `game-popup ${randomTheme}`;
         }
 
-        // Random Image & Messages
+        // NO ROTATION for Metro Style (Flat)
+        popup.style.transform = `scale(1)`;
+
+        // Content
         const imgNum = Math.floor(Math.random() * 7) + 1;
-        const ads = ["FERMEZ-MOI!", "Pop-up gênant!", "Cliquez ici", "Publicité!", "Supprimez-moi!", "Malveillant!", "Alerte!"];
+        const ads = ["FERMEZ-MOI!", "Metro UI", "Windows 8", "Publicité!", "Mise à jour", "Tuiles Dynamiques", "Attention"];
         const msg = isClue ? "INDICE TROUVÉ !" : ads[Math.floor(Math.random() * ads.length)];
 
         popup.innerHTML = `
             <div class="popup-header">
-                <span>${isClue ? `🔑 INDICE [${part}]` : ""}</span>
+                <span>${isClue ? `🔑 CLÉ [${part}]` : new Date().toLocaleTimeString()}</span>
+                <span>✖</span>
             </div>
             <div class="popup-content">
                 ${isClue ? `
                     <div class="clue-box">
-                        <span class="clue-label">PARTIE DU MOT DE PASSE</span>
+                        <span class="clue-label">SÉQUENCE DE DÉCRYPTAGE</span>
                         <span class="clue-value">${part}</span>
                     </div>
-                ` : `<img src="img/${imgNum}.png" alt="Popup Ad">`}
+                ` : `<img src="img/${imgNum}.png" alt="Popup Ad" onerror="this.style.display='none'">`}
                 <p class="popup-msg">${msg}</p>
-                <button class="close-popup-btn">✖ FERMER</button>
+                <button class="close-popup-btn">Fermer</button>
             </div>
         `;
 
-        // Hide it first and append to DOM to get initial dimensions (if not image)
+        // Position logic
         popup.style.visibility = 'hidden';
         this.popupArea.appendChild(popup);
 
+        const onReady = () => {
+            // Dimensions
+            const width = 350;
+            const height = popup.offsetHeight || 250;
+
+            // Viewport safety
+            const maxX = window.innerWidth - width - 20;
+            const maxY = window.innerHeight - height - 20;
+            const minY = 50;
+
+            const x = Math.max(10, Math.floor(Math.random() * maxX));
+            const y = Math.max(minY, Math.floor(Math.random() * (maxY - minY) + minY));
+
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+
+            popup.style.visibility = 'visible';
+        };
+
         const img = popup.querySelector('img');
-        if (img && !img.complete) {
-            img.onload = () => this.applyPosition(popup);
-            img.onerror = () => this.applyPosition(popup);
+        if (img && !isClue) {
+            if (img.complete) onReady();
+            else {
+                img.onload = onReady;
+                img.onerror = onReady;
+            }
         } else {
-            this.applyPosition(popup);
+            onReady();
         }
 
+        // Close Event
         const closeBtn = popup.querySelector('.close-popup-btn');
-        closeBtn.onclick = () => this.closePopup(popup);
+        const triggerClose = (e) => {
+            e.stopPropagation();
+            this.closePopup(popup, e.clientX, e.clientY);
+        };
+
+        closeBtn.onclick = triggerClose;
+        popup.onclick = (e) => {
+            popup.style.zIndex = 100 + this.popups.length + 1;
+        };
 
         this.popups.push(popup);
     }
 
-    applyPosition(popup) {
-        // Ensure it's in the DOM
-        if (!popup.parentNode) return;
+    spawnParticles(x, y) {
+        const particleCount = 12;
+        const colors = ['#ff0055', '#00e5ff', '#ffffff', '#ffbd2e'];
 
-        // First append to DOM (hidden) to get dimensions
-        popup.style.visibility = 'hidden';
+        for (let i = 0; i < particleCount; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            p.style.left = `${x}px`;
+            p.style.top = `${y}px`;
 
-        // Wait for a frame to ensure layout is calculated
-        requestAnimationFrame(() => {
-            const popupWidth = popup.offsetWidth || 320;
-            const popupHeight = popup.offsetHeight || 200;
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 2 + Math.random() * 4;
+            const tx = Math.cos(angle) * velocity * 50;
+            const ty = Math.sin(angle) * velocity * 50;
 
-            // Position Logic: Stay within viewport, avoiding HUD (approx top 100px)
-            const margin = 20;
-            const hudOffset = 100;
+            p.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            p.style.opacity = '1';
 
-            // Calculate max possible values
-            const maxX = Math.max(0, window.innerWidth - popupWidth - margin);
-            const maxY = Math.max(hudOffset, window.innerHeight - popupHeight - margin);
+            this.popupArea.appendChild(p);
 
-            // Random coordinates within safe zone
-            const x = Math.floor(margin / 2 + Math.random() * maxX);
-            const y = Math.floor(hudOffset + Math.random() * (maxY - hudOffset));
+            // Animate
+            requestAnimationFrame(() => {
+                p.style.transform = `translate(${tx}px, ${ty}px) scale(0)`;
+                p.style.opacity = '0';
+            });
 
-            popup.style.left = `${x}px`;
-            popup.style.top = `${y}px`;
-            popup.style.visibility = 'visible';
-        });
+            // Cleanup
+            setTimeout(() => p.remove(), 600);
+        }
     }
 
-    closePopup(popup) {
+    spawnFloatingScore(x, y) {
+        const el = document.createElement('div');
+        el.className = 'floating-score';
+        el.textContent = '+1';
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        this.popupArea.appendChild(el);
+        setTimeout(() => el.remove(), 800);
+    }
+
+    // Removed spawnParticles simply by not calling it
+    // Removed spawnFloatingScore simply by not calling it or keeping it minimal
+
+    closePopup(popup, clickX, clickY) {
         if (!this.gameActive) return;
 
-        popup.style.transform = 'scale(0.8)';
+        const index = this.popups.indexOf(popup);
+        if (index > -1) this.popups.splice(index, 1);
+        else return;
+
+        // Metro animation: Slide down/fade out fast
+        popup.style.transition = 'all 0.2s ease-in';
         popup.style.opacity = '0';
+        popup.style.transform = 'scale(0.95)';
 
         setTimeout(() => {
-            if (popup.parentNode) {
-                popup.parentNode.removeChild(popup);
-            }
-            const index = this.popups.indexOf(popup);
-            if (index > -1) this.popups.splice(index, 1);
+            if (popup.parentNode) popup.parentNode.removeChild(popup);
         }, 200);
 
         this.score++;
         this.displayScore.textContent = this.score;
+
+        // Optional: Add simple floating score if desired, else skip
+        // this.spawnFloatingScore(clickX, clickY); 
     }
 
     endGamePhase() {
         this.gameActive = false;
         clearInterval(this.timerInterval);
         clearTimeout(this.popupInterval);
+        this.timerItem.classList.remove('urgent');
 
-        // Clear popups
-        this.popups.forEach(p => {
-            if (p.parentNode) p.parentNode.removeChild(p);
+        // Clear popups with dramatic effect
+        this.popups.forEach((p, i) => {
+            setTimeout(() => {
+                p.style.transform = 'scale(0)';
+                p.style.opacity = '0';
+                setTimeout(() => p.remove(), 300);
+            }, i * 50);
         });
         this.popups = [];
 
         this.showScreen('password');
+        this.pwdInput.focus();
     }
 
     handleValidatePassword() {
@@ -268,9 +361,28 @@ class PopUpGame {
         if (input === this.correctPassword) {
             this.showVictory();
         } else {
-            alert("Mot de passe incorrect !");
+            this.attempts--;
+
+            // Shake effect
+            this.pwdInput.style.borderColor = 'var(--metro-red)';
+            this.pwdInput.classList.add('shake');
+            setTimeout(() => {
+                this.pwdInput.style.borderColor = '#ccc';
+                this.pwdInput.classList.remove('shake');
+            }, 500);
+
             this.pwdInput.value = '';
+
+            if (this.attempts > 0) {
+                alert(`Accès Refusé ! Mot de passe incorrect.\nIl vous reste ${this.attempts} essais.`);
+            } else {
+                this.showHacked();
+            }
         }
+    }
+
+    showHacked() {
+        this.showScreen('hacked');
     }
 
     showVictory() {

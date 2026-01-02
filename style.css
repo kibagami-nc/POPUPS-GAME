@@ -1,17 +1,14 @@
 :root {
-    --primary: #FF3D00;
-    --primary-glow: rgba(255, 61, 0, 0.5);
-    --secondary: #3498db;
-    --success: #2ecc71;
-    --warning: #f39c12;
-    --danger: #e74c3c;
-    --bg-dark: #0f172a;
-    --glass: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --text-white: #f8fafc;
-    --text-gray: #94a3b8;
-    --font-main: 'Outfit', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --metro-purple: #6a00ff;
+    --metro-blue: #00a4ef;
+    --metro-teal: #00aba9;
+    --metro-magenta: #ff0097;
+    --metro-lime: #a4c400;
+    --metro-orange: #fa6800;
+    --metro-red: #ee1111;
+    --metro-dark: #1d1d1d;
+    --metro-gray: #eff4f9;
+    --font-ui: "Segoe UI", "Segoe UI Light", "Roboto", sans-serif;
 }
 
 * {
@@ -21,14 +18,13 @@
 }
 
 body {
-    font-family: var(--font-main);
-    background-color: var(--bg-dark);
-    color: var(--text-white);
+    font-family: var(--font-ui);
+    background-color: #180052;
+    /* Deep Metro Purple Background */
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDQwTDQwIDBIOjB2NDB6bTQwIDBWMHkwIDQweiIgZmlsbD0iIzFmMDBhMyIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L2c+PC9zdmc+');
+    color: white;
     height: 100vh;
     overflow: hidden;
-    background-image:
-        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(244, 63, 94, 0.15) 0%, transparent 40%);
 }
 
 #game-container {
@@ -50,182 +46,200 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 10;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    background: transparent;
 }
 
 .screen.active {
     display: flex;
-    opacity: 1;
+    animation: fadeIn 0.3s ease-out;
 }
 
-/* Glass Panels */
+/* Metro "Start Screen" Panel */
 .glass-panel {
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    padding: 3rem;
-    width: 90%;
-    max-width: 500px;
-    text-align: center;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(30px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    background: transparent;
+    padding: 2rem;
+    width: 100%;
+    max-width: 800px;
+    text-align: left;
+    /* Metro is often left-aligned w/ large typographic hierarchy */
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 /* Typography styles */
 .glitch-text {
-    font-size: 5rem;
-    font-weight: 800;
-    letter-spacing: -2px;
+    font-family: "Segoe UI Light", sans-serif;
+    font-size: 6rem;
+    font-weight: 300;
+    color: white;
     margin-bottom: 0.5rem;
-    background: linear-gradient(to bottom, #fff, #94a3b8);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    position: relative;
+    text-transform: lowercase;
+    animation: none;
+    /* Clean typography for Metro */
 }
 
 .subtitle {
-    font-size: 1.25rem;
-    color: var(--text-gray);
-    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 300;
 }
 
 .highlight {
-    color: var(--primary);
+    color: white;
     font-weight: 600;
 }
 
-/* Inputs & Buttons */
+/* Inputs & Buttons - TILE STYLE */
 .input-group {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     text-align: left;
 }
 
 .input-group label {
     display: block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 1px;
+    font-size: 1rem;
+    font-weight: 400;
     margin-bottom: 0.5rem;
-    color: var(--text-gray);
+    color: white;
 }
 
 input {
     width: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 1rem;
-    color: white;
-    font-family: var(--font-mono);
-    font-size: 1.1rem;
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 0;
+    padding: 0.8rem;
+    color: black;
+    font-family: var(--font-ui);
+    font-size: 1.2rem;
     outline: none;
-    transition: all 0.3s ease;
 }
 
 input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px var(--primary-glow);
+    border-color: var(--metro-blue);
 }
 
 button {
     cursor: pointer;
     border: none;
-    border-radius: 12px;
+    border-radius: 0;
     padding: 1rem 2rem;
-    font-family: var(--font-main);
+    font-family: var(--font-ui);
     font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 100%;
+    font-size: 1.1rem;
+    text-transform: capitalize;
+    transition: transform 0.1s;
+    width: auto;
+    min-width: 200px;
+}
+
+button:active {
+    transform: scale(0.98);
 }
 
 .primary-btn {
-    background-color: var(--primary);
+    background-color: var(--metro-teal);
     color: white;
-    box-shadow: 0 10px 15px -3px var(--primary-glow);
+    margin-top: 1rem;
 }
 
 .primary-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px var(--primary-glow);
-    filter: brightness(1.1);
-}
-
-.primary-btn:active {
-    transform: translateY(0);
+    outline: 3px solid rgba(255, 255, 255, 0.2);
 }
 
 .success-btn {
-    background: var(--success);
+    background: var(--metro-lime);
     color: white;
 }
 
 .warn-btn {
-    background: var(--warning);
+    background: var(--metro-orange);
     color: white;
 }
 
 .button-row {
     display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 10px;
+    margin-top: 1.5rem;
 }
 
 /* HUD System */
 .hud {
     position: fixed;
-    top: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50px;
+    right: 50px;
+    /* Metro HUD often aligned nicely */
+    left: auto;
+    transform: none;
     display: flex;
-    gap: 1rem;
+    gap: 10px;
     z-index: 100;
 }
 
-.glass-mini {
-    background: var(--glass);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
-    padding: 0.75rem 1.5rem;
-    border-radius: 16px;
+.hud-item {
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
+    padding: 1rem;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    min-width: 100px;
+    align-items: flex-start;
+    min-width: 120px;
 }
 
 .hud-item .label {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: var(--text-gray);
-    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
 }
 
 .hud-item .value {
-    font-family: var(--font-mono);
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: white;
+}
+
+.timer-item {
+    background: var(--metro-red);
+    /* Alert color for time */
 }
 
 .timer-item .value {
-    color: var(--danger);
+    color: white;
+}
+
+.timer-item.urgent {
+    animation: pulse-tile 0.5s infinite;
+}
+
+@keyframes pulse-tile {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+
+
+/* Gameplay Background */
+#game-board {
+    background-image: url('img/UwU.jpg');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
 }
 
 /* Popup Area */
@@ -238,242 +252,390 @@ button {
     overflow: hidden;
 }
 
-/* POPUPS Style */
+/* WINDOWS 8 POPUPS (Modern UI Dialogs) */
 .game-popup {
     position: absolute;
-    background: #e67e22;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    background: white;
+    border: 4px solid var(--metro-blue);
+    /* Theme Color Border */
+    border-radius: 0;
+    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.2);
+    /* Dim background illusion if desired, or just shadow */
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.2);
     overflow: hidden;
     user-select: none;
-    animation: popupIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     cursor: default;
     display: flex;
     flex-direction: column;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    width: 320px;
-    /* Fixed width for better predictability */
-    max-width: 90vw;
+    width: 350px;
+    animation: slideInMetro 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
 }
 
-@keyframes popupIn {
-    0% {
-        transform: scale(0.5);
+.game-popup.theme-classic {
+    border-color: var(--metro-blue);
+}
+
+.game-popup.theme-modern {
+    border-color: var(--metro-purple);
+}
+
+.game-popup.theme-alert {
+    border-color: var(--metro-orange);
+}
+
+.game-popup.theme-neon {
+    border-color: var(--metro-magenta);
+}
+
+@keyframes slideInMetro {
+    from {
+        transform: translateX(100px);
         opacity: 0;
     }
 
-    100% {
-        transform: scale(1);
+    to {
+        transform: translateX(0);
         opacity: 1;
     }
 }
 
 .popup-header {
-    background: rgba(0, 0, 0, 0.1);
-    padding: 0.4rem 0.75rem;
+    background: transparent;
+    padding: 10px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: white;
+    color: var(--metro-blue);
+    font-family: var(--font-ui);
+    font-size: 1.1rem;
+    font-weight: 300;
 }
 
+.game-popup.theme-classic .popup-header {
+    color: var(--metro-blue);
+}
+
+.game-popup.theme-modern .popup-header {
+    color: var(--metro-purple);
+}
+
+.game-popup.theme-alert .popup-header {
+    color: var(--metro-orange);
+}
+
+.game-popup.theme-neon .popup-header {
+    color: var(--metro-magenta);
+}
+
+
 .popup-content {
-    padding: 0.5rem;
+    padding: 0 20px 20px 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
+    align-items: flex-start;
+    gap: 15px;
 }
 
 .popup-content img {
-    max-width: 100%;
-    max-height: 250px;
-    /* Prevent it from being too tall */
-    object-fit: contain;
-    border-radius: 4px;
-}
-
-.popup-msg {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: white;
-    text-transform: uppercase;
-}
-
-/* Clue Popup Styles */
-.clue-popup {
-    background: #2980b9 !important;
-    /* Blue for clues */
-    border: 3px solid #f1c40f !important;
-    /* Gold border */
-    z-index: 1000 !important;
-    animation: cluePulse 2s infinite ease-in-out, popupIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-}
-
-@keyframes cluePulse {
-    0% {
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 0px rgba(241, 196, 15, 0.4);
-    }
-
-    50% {
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px 10px rgba(241, 196, 15, 0);
-    }
-
-    100% {
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 0px rgba(241, 196, 15, 0.4);
-    }
-}
-
-.clue-box {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin: 1rem 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px dashed rgba(255, 255, 255, 0.3);
-}
-
-.clue-label {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: #bdc3c7;
-    margin-bottom: 0.5rem;
-    letter-spacing: 1px;
-}
-
-.clue-value {
-    font-family: var(--font-mono);
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #f1c40f;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.close-popup-btn {
-    background: #c0392b;
-    color: white;
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 800;
-    width: 90%;
-    margin-bottom: 0.75rem;
-    box-shadow: 0 4px 0 #962d22;
-}
-
-.close-popup-btn:hover {
-    background: #e74c3c;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 0 #962d22;
-}
-
-.close-popup-btn:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 #962d22;
-}
-
-/* Victory Screen Specifics */
-.victory-panel {
-    max-width: 600px;
-}
-
-.congrats {
-    font-size: 3rem;
-    margin-bottom: 1.5rem;
-    color: var(--success);
-}
-
-.stat-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 1.5rem 0;
-}
-
-.stat-card .value {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--warning);
-}
-
-.leaderboard {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    text-align: left;
-}
-
-.leaderboard h3 {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: var(--warning);
-}
-
-.leaderboard ul {
-    list-style: none;
-}
-
-.leaderboard li {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.leaderboard li:last-child {
-    border-bottom: none;
-}
-
-.leaderboard li .rank {
-    width: 30px;
-}
-
-.leaderboard li .pseudo {
-    flex-grow: 1;
-}
-
-.leaderboard-separator {
-    text-align: center;
-    font-size: 1.2rem;
-    color: var(--text-gray);
-    padding: 0.3rem 0 !important;
-    border-bottom: none !important;
-}
-
-.current-player-rank {
-    border: 1px solid var(--warning);
-    border-radius: 8px;
-    padding: 0.75rem !important;
-    margin-top: 0.5rem;
-    background: rgba(241, 196, 15, 0.1);
-}
-
-.current-player-rank .rank,
-.current-player-rank .pseudo {
-    color: var(--warning);
-    font-weight: 700;
-}
-
-.secondary-link {
-    color: var(--text-gray);
-    text-decoration: none;
-    font-size: 0.9rem;
-    margin-top: 1rem;
+    width: 100%;
+    height: auto;
+    border: none;
     display: block;
 }
 
-.secondary-link:hover {
-    color: var(--text-white);
+.popup-msg {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: #333;
 }
 
-.hidden {
+.close-popup-btn {
+    background: #ccc;
+    color: black;
+    font-weight: 400;
+    width: auto;
+    align-self: flex-end;
+    padding: 0.5rem 1.5rem;
+    min-width: auto;
+}
+
+.close-popup-btn:hover {
+    background: var(--metro-dark);
+    color: white;
+}
+
+/* Clue Popups - Standard Metro Window Style */
+.clue-popup {
+    /* Removed !important overrides for position/size to match standard popups */
+    background: white;
+    border: 4px solid var(--metro-lime) !important;
+    /* Distinct lime border for clues */
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.2);
+}
+
+.clue-popup .popup-header {
+    background: var(--metro-lime);
+    /* Solid header for clue */
+    color: white !important;
+}
+
+.clue-popup .popup-msg {
+    color: #333;
+    font-weight: 600;
+}
+
+.clue-popup .close-popup-btn {
+    background: var(--metro-lime);
+    color: white;
+}
+
+.clue-popup .close-popup-btn:hover {
+    background: #8caba9;
+    /* slightly darker lime or gray */
+}
+
+.clue-box {
+    border: 2px dashed var(--metro-lime);
+    background: rgba(164, 196, 0, 0.1);
+    /* Light lime wash */
+    padding: 1rem;
+    width: 100%;
+}
+
+.clue-value {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--metro-lime);
+}
+
+/* Victory Screen - Metro Makeover */
+.victory-metro {
+    background-color: var(--metro-teal);
+    width: 100%;
+    height: 100vh;
     display: none;
+    /* Logic toggles flex */
+    flex-direction: column;
+    padding: 4rem 6rem;
+    overflow-y: auto;
+    animation: fadeIn 0.5s ease-out;
+    justify-content: flex-start !important;
+    /* Override .screen centering */
+}
+
+.victory-metro.active {
+    display: flex;
+}
+
+.victory-content {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    /* Slide in content */
+    animation: slideInContent 0.6s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+@keyframes slideInContent {
+    from {
+        transform: translateX(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.metro-title {
+    font-family: "Segoe UI Light", sans-serif;
+    font-size: 6rem;
+    font-weight: 300;
+    color: white;
+    margin-bottom: 3rem;
+    letter-spacing: -2px;
+}
+
+.metro-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 3rem;
+}
+
+.metro-tile {
+    background: var(--metro-blue);
+    height: 200px;
+    /* Square tiles */
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    user-select: none;
+    transition: transform 0.1s;
+}
+
+.metro-tile:active {
+    transform: scale(0.98);
+}
+
+.tile-score {
+    background: var(--metro-purple);
+}
+
+.tile-player {
+    background: var(--metro-magenta);
+    grid-column: span 2;
+    /* Wide tile for name */
+}
+
+.tile-label {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.tile-value {
+    font-size: 4rem;
+    font-weight: 300;
+    line-height: 1;
+    word-break: break-word;
+    /* Prevents overflow for long names */
+}
+
+.tile-player .tile-value {
+    font-size: 3.5rem;
+    /* Slightly smaller for name */
+}
+
+.tile-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    font-size: 4rem;
+    opacity: 0.2;
+}
+
+
+.leaderboard-box {
+    grid-column: span 2;
+    /* Wider tile */
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    height: 415px;
+    /* Taller tile or covers two rows */
+    overflow-y: auto;
+    /* Make it span rows if using grid-auto-flow: dense or explicit rows */
+    grid-row: span 2;
+}
+
+@media (max-width: 800px) {
+
+    .leaderboard-box,
+    .tile-player {
+        grid-column: span 1;
+    }
+}
+
+.leaderboard-box h3 {
+    font-weight: 300;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+.leaderboard-box ul {
+    list-style: none;
+}
+
+.leaderboard-box li {
+    font-size: 1.1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+}
+
+.leaderboard-box li .rank {
+    width: 40px;
+    font-weight: 600;
+}
+
+.metro-actions {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.metro-btn-large {
+    background: transparent;
+    border: 3px solid white;
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.8rem 3rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.metro-btn-large:hover {
+    background: white;
+    color: var(--metro-teal);
+}
+
+.metro-link {
+    font-size: 1.2rem;
+    color: white;
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.metro-link:hover {
+    opacity: 1;
+    text-decoration: none;
+}
+
+/* Hacked Screen (Failure) */
+.hacked-metro {
+    background-color: var(--metro-red);
+    color: white;
+    justify-content: center !important;
+    animation: hackBlast 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes hackBlast {
+    0% {
+        transform: scale(1.2);
+        filter: brightness(2);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+
+.hacked-icon {
+    font-size: 8rem;
+    font-family: inherit;
+    display: block;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.hacked-content {
+    max-width: 800px;
+    padding: 2rem;
+}
+
+.hacked-metro .metro-title {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+}
+
+.hacked-metro .subtitle {
+    font-size: 2rem;
+    margin-bottom: 4rem;
 }
